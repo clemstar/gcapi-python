@@ -228,10 +228,11 @@ class GCapiClient:
 		resp = json.loads(r.text)
 		return resp
 
-	def update_trade(self, OrderId, quantity, direction, trading_acc_id=None, market_id=None, market_name=None, stop_loss=None,
+	def update_trade(self, orderid, quantity, direction, trading_acc_id=None, market_id=None, market_name=None, stop_loss=None,
 					take_profit=None):
 		"""
 		Updates an existing trade order
+        :param orderid: orderid of trade to update
 		:param quantity: quantity to trade
 		:param direction: buy or sell
 		:param trading_acc_id: trading account ID
@@ -257,7 +258,7 @@ class GCapiClient:
 		else:
 			raise ValueError('Please provide buy or sell for direction')
 		trade_details = {
-            "OrderId": OrderId,
+            "OrderId": orderid,
 			"Direction": direction,
 			"MarketId": market_id,
 			"MarketName": market_name,
