@@ -228,6 +228,52 @@ class GCapiClient:
 		resp = json.loads(r.text)
 		return resp
 
+	def update_trade(self, OrderId, quantity, direction, trading_acc_id=None, market_id=None, market_name=None, stop_loss=None,
+					take_profit=None):
+		"""
+		Updates an existing trade order
+		:param quantity: quantity to trade
+		:param direction: buy or sell
+		:param trading_acc_id: trading account ID
+		:param market_id: market ID
+		:param market_name: market name
+		:param stop_loss: stop loss price
+		:param take_profit: take profit price
+		:return:
+		"""
+        
+		if trading_acc_id is None:
+			trading_acc_id = self.trading_account_id
+		if market_id is None:
+			market_id = self.market_id
+		if market_name is None:
+			market_name = self.market_name
+		api_url="/order/updatetradeorder"
+		direction=direction.lower()
+		if direction=='buy':
+			opp_direction='sell'
+		elif direction=='sell':
+			opp_direction='buy'
+		else:
+			raise ValueError('Please provide buy or sell for direction')
+		trade_details = {
+            "OrderId": OrderId,
+			"Direction": direction,
+			"MarketId": market_id,
+			"MarketName": market_name,
+			'TradingAccountId': trading_acc_id,
+		}
+		ifdone = {}
+		if stop_loss:
+			ifdone['Stop'] = {'TriggerPrice': stop_loss, "Direction": opp_direction, 'Quantity': quantity}
+		if take_profit:
+			ifdone['Limit'] = {'TriggerPrice': take_profit, "Direction": opp_direction, 'Quantity': quantity}
+		if len(ifdone):
+			trade_details['IfDone'] = [ifdone]
+		r = self.session.post(self.rest_url + api_url, json=trade_details)
+		resp = json.loads(r.text)
+		return resp
+
 	def list_open_positions(self, trading_acc_id=None):
 		"""
 		Returns List of Open Positons in Trading Account
