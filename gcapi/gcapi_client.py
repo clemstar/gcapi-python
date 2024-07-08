@@ -176,13 +176,13 @@ class GCapiClient:
 		except:
 			raise GCapiException(resp)
 
-
-	def trade_order(self, quantity, offer_price, direction, trading_acc_id=None, market_id=None, market_name=None, stop_loss=None,
-					take_profit=None, trigger_price=None):
+	def trade_order(self, quantity, direction, offer_price=None, bid_price=None, trading_acc_id=None, market_id=None, market_name=None, trigger_price=None, stop_loss=None,
+					take_profit=None, price_tolerance=0):
 		"""
 		Makes a new trade order
 		:param quantity: quantity to trade
 		:param offer_price: offer price
+        :param bid_price: bid price
 		:param direction: buy or sell
 		:param trading_acc_id: trading account ID
 		:param market_id: market ID
@@ -190,6 +190,7 @@ class GCapiClient:
 		:param stop_loss: stop loss price
 		:param take_profit: take profit price
 		:param trigger_price: trigger price for stop/limit orders
+        :param price_tolerance: price tolerance
 		:return:
 		"""
 		if trading_acc_id is None:
@@ -199,11 +200,11 @@ class GCapiClient:
 		if market_name is None:
 			market_name = self.market_name
 		api_url="/order/newtradeorder"
-		direction=direction.lower()
-		if direction=='buy':
-			opp_direction='sell'
-		elif direction=='sell':
-			opp_direction='buy'
+		direction=direction.capitalize()
+		if direction=='Buy':
+			opp_direction='Sell'
+		elif direction=='Sell':
+			opp_direction='Buy'
 		else:
 			raise ValueError('Please provide buy or sell for direction')
 		trade_details = {
@@ -211,8 +212,10 @@ class GCapiClient:
 			"MarketId": market_id,
 			"Quantity": quantity,
 			"MarketName": market_name,
-			'TradingAccountId': trading_acc_id,
-			"OfferPrice": offer_price
+			"TradingAccountId": trading_acc_id,
+			"OfferPrice": offer_price,
+            "BidPrice": bid_price,
+            "PriceTolerance": price_tolerance
 		}
 		if trigger_price is not None:
 			trade_details['TriggerPrice']=trigger_price
@@ -232,7 +235,7 @@ class GCapiClient:
 					take_profit=None):
 		"""
 		Updates an existing trade order
-        :param orderid: orderid of trade to update
+        :param orderid: orderid of the trade to be updated
 		:param quantity: quantity to trade
 		:param direction: buy or sell
 		:param trading_acc_id: trading account ID
@@ -262,7 +265,7 @@ class GCapiClient:
 			"Direction": direction,
 			"MarketId": market_id,
 			"MarketName": market_name,
-			'TradingAccountId': trading_acc_id,
+			"TradingAccountId": trading_acc_id
 		}
 		ifdone = {}
 		if stop_loss:
