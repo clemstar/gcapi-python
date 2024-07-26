@@ -309,16 +309,18 @@ class GCapiClient:
 		
 		return resp
 		
-	def cancel_order(self, order_id, trading_acc_id=None):
-		"""
+	def cancel_order(self, order_id, trading_acc_id=None, market_id=None):
+        """
 		Cancels an Active Order
 		:order_id: Order ID of the Order to Cancel
 		"""
 		if trading_acc_id is None:
 			trading_acc_id = self.trading_account_id
+		if market_id is None:
+			market_id = self.market_id
 
 		api_url = "/order/cancel"
-		json_data = {'TradingAccountId':self.trading_account_id, 'OrderId':order_id}
+		json_data = {'TradingAccountId':self.trading_account_id, 'OrderId':order_id, 'MarketId': market_id}
 		r = self.session.post(self.rest_url + api_url, json=json_data)
 		resp = json.loads(r.text)
 		
